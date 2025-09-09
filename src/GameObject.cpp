@@ -14,10 +14,10 @@ GameObject::~GameObject() {
     }
 }
 
-void GameObject::update() {
+void GameObject::update(float deltaTime) {
     // Move object 1 pixel
-    x++;
-    y++;
+    x += deltaTime * speed;
+    y += deltaTime * speed;
 
     // start and where to crop
     srcRect.x = srcRect.y = 0;

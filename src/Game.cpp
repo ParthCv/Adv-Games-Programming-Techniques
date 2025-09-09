@@ -68,9 +68,17 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
+    auto currentTime = static_cast<float>(SDL_GetTicks());
+    if (lastFrameTime == 0.0) {
+        lastFrameTime = currentTime;
+    }
+
+    float deltaTime = (currentTime - lastFrameTime) / 1000.0f;
+    lastFrameTime = currentTime;
+
     frameCount++;
-    std::cout << frameCount << std::endl;
-    player->update();
+    std::cout << frameCount << " delta time :" << deltaTime << std::endl;
+    player->update(deltaTime);
 }
 
 void Game::render() {

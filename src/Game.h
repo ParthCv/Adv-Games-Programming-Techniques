@@ -32,6 +32,7 @@ public:
 private:
     int frameCount = 0;
     bool isRunning = false;
+    float lastFrameTime = 0.0f;
 
     SDL_Window* window = nullptr;
 

@@ -12,13 +12,14 @@ public:
     GameObject(const char* path, int x, int y);
     ~GameObject();
 
-    void update();
+    void update(float deltaTime);
     void draw();
 
 private:
     int x{}, y{};
     SDL_Texture* texture{nullptr};
     SDL_FRect srcRect{}, destRect{};
+    float speed = 100;
 
 };
 
