@@ -8,7 +8,10 @@
 #include <iostream>
 #include <ostream>
 
+#include "GameObject.h"
+
 Map *map = nullptr;
+GameObject *player = nullptr;
 
 Game::Game() {
 
@@ -47,6 +50,8 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
 
     // Load our map
     map = new Map();
+
+    player = new GameObject("../asset/ball.png", 0, 0);
 }
 
 void Game::handleEvents() {
@@ -65,6 +70,7 @@ void Game::handleEvents() {
 void Game::update() {
     frameCount++;
     std::cout << frameCount << std::endl;
+    player->update();
 }
 
 void Game::render() {
@@ -87,6 +93,8 @@ void Game::render() {
     SDL_RenderClear(renderer);
 
     map->draw();
+
+    player->draw();
 
     SDL_RenderPresent(renderer);
 }
