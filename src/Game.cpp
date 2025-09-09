@@ -3,9 +3,12 @@
 //
 
 #include "Game.h"
+#include "Map.h"
 
 #include <iostream>
 #include <ostream>
+
+Map *map = nullptr;
 
 Game::Game() {
 
@@ -41,6 +44,9 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     } else {
         isRunning = false;
     }
+
+    // Load our map
+    map = new Map();
 }
 
 void Game::handleEvents() {
@@ -62,22 +68,25 @@ void Game::update() {
 }
 
 void Game::render() {
-    Uint64 currentTime = SDL_GetTicks();
-    int colorIndex = (currentTime / 1000) % 6;
-
-    switch(colorIndex) {
-        case 0: r = 255; g = 0;   b = 0;   break; // Red
-        case 1: r = 0;   g = 255; b = 0;   break; // Green
-        case 2: r = 0;   g = 0;   b = 255; break; // Blue
-        case 3: r = 255; g = 255; b = 0;   break; // Yellow
-        case 4: r = 255; g = 0;   b = 255; break; // Magenta
-        case 5: r = 0;   g = 255; b = 255; break; // Cyan
-        default: r = 0;   g = 0;   b = 255; break;
-    }
-    a = 255;
-
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    // Uint64 currentTime = SDL_GetTicks();
+    // int colorIndex = (currentTime / 1000) % 6;
+    //
+    // switch(colorIndex) {
+    //     case 0: r = 255; g = 0;   b = 0;   break; // Red
+    //     case 1: r = 0;   g = 255; b = 0;   break; // Green
+    //     case 2: r = 0;   g = 0;   b = 255; break; // Blue
+    //     case 3: r = 255; g = 255; b = 0;   break; // Yellow
+    //     case 4: r = 255; g = 0;   b = 255; break; // Magenta
+    //     case 5: r = 0;   g = 255; b = 255; break; // Cyan
+    //     default: r = 0;   g = 0;   b = 255; break;
+    // }
+    // a = 255;
+    //
+    // SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
+
+    map->draw();
 
     SDL_RenderPresent(renderer);
 }

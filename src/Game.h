@@ -27,12 +27,13 @@ public:
         return isRunning;
     }
 
+    SDL_Renderer* renderer = nullptr;
+
 private:
     int frameCount = 0;
-    bool isRunning;
+    bool isRunning = false;
 
-    SDL_Window* window;
-    SDL_Renderer* renderer;
+    SDL_Window* window = nullptr;
 
     Uint8 r, g, b, a;
 };
