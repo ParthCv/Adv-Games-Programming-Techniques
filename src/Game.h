@@ -10,6 +10,8 @@
 #pragma once
 #include <SDL3/SDL.h>
 
+#include "ecs/World.h"
+
 class Game {
 public:
     Game();
@@ -28,6 +30,8 @@ public:
     }
 
     SDL_Renderer* renderer = nullptr;
+
+    World world;
 
 private:
     int frameCount = 0;

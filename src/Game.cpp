@@ -8,10 +8,8 @@
 #include <iostream>
 #include <ostream>
 
-#include "GameObject.h"
 
 Map *map = nullptr;
-GameObject *player = nullptr;
 
 Game::Game() {
 
@@ -51,7 +49,16 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     // Load our map
     map = new Map();
 
-    player = new GameObject("../asset/ball.png", 0, 0);
+    //player = new GameObject("../asset/ball.png", 0, 0);
+
+    auto& player(world.createEntity());
+    player.addComponent<Position>(0,0);
+
+    SDL_Texture *texture = TextureManager::load("../asset/ball.png");
+    SDL_FRect playerSrcRect = {0,0,32,32};
+    SDL_FRect playerDstRect = {0,0,64,64};
+
+    player.addComponent<Sprite>(texture, playerSrcRect, playerDstRect);
 }
 
 void Game::handleEvents() {
@@ -78,7 +85,7 @@ void Game::update() {
 
     frameCount++;
     std::cout << frameCount << " delta time :" << deltaTime << std::endl;
-    player->update(deltaTime);
+    world.update(deltaTime);
 }
 
 void Game::render() {
@@ -102,7 +109,7 @@ void Game::render() {
 
     map->draw();
 
-    player->draw();
+    world.render();
 
     SDL_RenderPresent(renderer);
 }

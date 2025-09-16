@@ -13,6 +13,9 @@ if (WIN32)
     link_directories(
             ${SDL3_PATH}/lib
             ${SDL3_IMAGE_PATH}/lib
+            ${PROJECT_SOURCE_DIR}/src
+            ${PROJECT_SOURCE_DIR}/src/ecs
+            ${PROJECT_SOURCE_DIR}/src/ecs/system
     )
 endif ()
 
