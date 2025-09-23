@@ -14,10 +14,17 @@ class MovementSystem {
 public:
     void update(std::vector<std::unique_ptr<Entity>>& entities, float dt) {
         for (auto& entity : entities) {
-            if (entity->hasComponent<Position>()) {
-                auto& position = entity->getComponent<Position>();
-                position.x += 60 * dt;
-                position.y += 60 * dt;
+            if (entity->hasComponent<Transform>() && entity->hasComponent<Velocity>()) {
+                auto& transform = entity->getComponent<Transform>();
+                auto& velocity = entity->getComponent<Velocity>();
+
+                Vector2D directionVec = velocity.direction;
+
+                directionVec.normalize();
+
+                Vector2D velocityVec = directionVec * velocity.speed;
+
+                transform.position += (velocityVec * dt);
             }
         }
 

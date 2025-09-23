@@ -15,11 +15,11 @@ class RenderSystem {
 public:
     void render(std::vector<std::unique_ptr<Entity>>& entities) {
         for (auto& entity : entities) {
-            if (entity->hasComponent<Position>() && entity->hasComponent<Sprite>()) {
-                auto& position = entity->getComponent<Position>();
+            if (entity->hasComponent<Transform>() && entity->hasComponent<Sprite>()) {
+                auto& t = entity->getComponent<Transform>();
                 auto& sprite = entity->getComponent<Sprite>();
-                sprite.dest.x = position.x;
-                sprite.dest.y = position.y;
+                sprite.dest.x = t.position.x;
+                sprite.dest.y = t.position.y;
                 TextureManager::draw(sprite.texture,sprite.src, sprite.dest);
             }
         }

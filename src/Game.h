@@ -39,6 +39,7 @@ private:
     float lastFrameTime = 0.0f;
 
     SDL_Window* window = nullptr;
+    SDL_Event event;
 
     Uint8 r, g, b, a;
 };

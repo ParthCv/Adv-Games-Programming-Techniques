@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Entity.h"
+#include "system/KeyboardInputSystem.h"
 #include "system/MovementSystem.h"
 #include "system/RenderSystem.h"
 
@@ -15,9 +16,12 @@ class World {
     std::vector<std::unique_ptr<Entity>> entities;
     MovementSystem movementSystem;
     RenderSystem renderSystem;
+    KeyboardInputSystem keyboardInputSystem;
 public:
-    void update(float dt) {
+    void update(float dt, SDL_Event event) {
+        keyboardInputSystem.update(entities, event);
         movementSystem.update(entities, dt);
+        cleanup();
     };
 
     void render() {

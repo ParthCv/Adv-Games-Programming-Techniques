@@ -52,17 +52,19 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     //player = new GameObject("../asset/ball.png", 0, 0);
 
     auto& player(world.createEntity());
-    player.addComponent<Position>(0,0);
+    auto& playerTransform = player.addComponent<Transform>(Vector2D(0,0), 0.0f, 1.0f);
 
-    SDL_Texture *texture = TextureManager::load("../asset/ball.png");
-    SDL_FRect playerSrcRect = {0,0,32,32};
-    SDL_FRect playerDstRect = {0,0,64,64};
+    SDL_Texture *texture = TextureManager::load("../asset/mario.png");
+    SDL_FRect playerSrcRect = {0,0,32,44};
+    SDL_FRect playerDstRect = {playerTransform.position.x,playerTransform.position.y,64,88};
+
+    player.addComponent<Velocity>(Vector2D(0.5,1.5), 60.0f);
 
     player.addComponent<Sprite>(texture, playerSrcRect, playerDstRect);
 }
 
 void Game::handleEvents() {
-    SDL_Event event;
+    //SDL_Event event;
     SDL_PollEvent(&event);
 
     switch (event.type) {
@@ -85,7 +87,7 @@ void Game::update() {
 
     frameCount++;
     std::cout << frameCount << " delta time :" << deltaTime << std::endl;
-    world.update(deltaTime);
+    world.update(deltaTime, event);
 }
 
 void Game::render() {

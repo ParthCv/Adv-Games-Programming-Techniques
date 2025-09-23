@@ -24,6 +24,7 @@ add_executable(Adv_Game_Prog_Tech src/main.cpp
         src/TextureManager.cpp
         src/Map.cpp
         src/GameObject.cpp
+        src/Vector.cpp
 )
 
 target_link_libraries(Adv_Game_Prog_Tech
