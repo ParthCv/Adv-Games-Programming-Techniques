@@ -11,22 +11,30 @@
 
 void CollisionSystem::update (World& world) {
     const std::vector<Entity*> collidables = queryCollidables(world.getEntities());
+
+    // FIRST: Update all collider positions from transforms
+    for (auto* entity : collidables) {
+        auto& transform = entity->getComponent<Transform>();
+        auto& collider = entity->getComponent<Collider>();
+
+        collider.rect.x = transform.position.x;
+        collider.rect.y = transform.position.y;
+    }
+
+    // THEN: Check collisions
     for (size_t i = 0; i < collidables.size(); i++) {
         auto entityA = collidables[i];
-        auto& t = entityA->getComponent<Transform>();
         auto& colliderA = entityA->getComponent<Collider>();
 
-        colliderA.rect.x = t.position.x;
-        colliderA.rect.y = t.position.y;
-
-        for (size_t j = i+1; j < collidables.size(); j++) {
+        for (size_t j = i + 1; j < collidables.size(); j++) {
             auto entityB = collidables[j];
             auto& colliderB = entityB->getComponent<Collider>();
 
             if (Collision::AABB(colliderA, colliderB)) {
-                std::cout << colliderA.tag << " hit " << colliderB.tag << std::endl;
+                world.getEventManager().emit(CollisionEvent(entityA, entityB));
             }
         }
+
     }
 }
 

@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Entity.h"
+#include "EventManager.h"
 #include "system/CollisionSystem.h"
 #include "system/KeyboardInputSystem.h"
 #include "system/MovementSystem.h"
@@ -19,7 +20,9 @@ class World {
     RenderSystem renderSystem;
     KeyboardInputSystem keyboardInputSystem;
     CollisionSystem collisionSystem;
+    EventManager eventManager;
 public:
+    World();
     void update(float dt, SDL_Event event) {
         keyboardInputSystem.update(entities, event);
         movementSystem.update(entities, dt);
@@ -47,6 +50,10 @@ public:
                 return !e->isActive();
             }
         );
+    }
+
+    EventManager& getEventManager() {
+        return eventManager;
     }
 
 };

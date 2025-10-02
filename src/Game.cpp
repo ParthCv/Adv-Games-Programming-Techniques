@@ -64,7 +64,7 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     playerCollider.rect.h = playerDstRect.h;
 
     auto& item (world.createEntity());
-    auto& itemTransform = item.addComponent<Transform>(Vector2D(100,200), 0.0f, 1.0f);
+    auto& itemTransform = item.addComponent<Transform>(Vector2D(300,300), 0.0f, 1.0f);
 
     SDL_Texture *itemTexture = TextureManager::load("../asset/coin.png");
     SDL_FRect itemSrcRect = {0,0,32,32};
