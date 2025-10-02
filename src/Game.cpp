@@ -49,8 +49,6 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     // Load our map
     map = new Map();
 
-    //player = new GameObject("../asset/ball.png", 0, 0);
-
     auto& player(world.createEntity());
     auto& playerTransform = player.addComponent<Transform>(Vector2D(0,0), 0.0f, 1.0f);
 
@@ -58,9 +56,25 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     SDL_FRect playerSrcRect = {0,0,32,44};
     SDL_FRect playerDstRect = {playerTransform.position.x,playerTransform.position.y,64,88};
 
-    player.addComponent<Velocity>(Vector2D(0.5,1.5), 60.0f);
-
+    player.addComponent<Velocity>(Vector2D(0.0,0.0), 120.0f);
     player.addComponent<Sprite>(texture, playerSrcRect, playerDstRect);
+
+    auto& playerCollider = player.addComponent<Collider>("Player");
+    playerCollider.rect.w = playerDstRect.w;
+    playerCollider.rect.h = playerDstRect.h;
+
+    auto& item (world.createEntity());
+    auto& itemTransform = item.addComponent<Transform>(Vector2D(100,200), 0.0f, 1.0f);
+
+    SDL_Texture *itemTexture = TextureManager::load("../asset/coin.png");
+    SDL_FRect itemSrcRect = {0,0,32,32};
+    SDL_FRect itemDstRect = {itemTransform.position.x,itemTransform.position.y,32,32};
+
+    item.addComponent<Sprite>(itemTexture, itemSrcRect, itemDstRect);
+    auto& itemCollider = item.addComponent<Collider>("Coin");
+    itemCollider.rect.w = itemDstRect.w;
+    itemCollider.rect.h = itemDstRect.h;
+
 }
 
 void Game::handleEvents() {
@@ -118,6 +132,7 @@ void Game::render() {
 
 
 void Game::destroy() {
+    TextureManager::clean();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

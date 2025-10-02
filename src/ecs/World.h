@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Entity.h"
+#include "system/CollisionSystem.h"
 #include "system/KeyboardInputSystem.h"
 #include "system/MovementSystem.h"
 #include "system/RenderSystem.h"
@@ -17,10 +18,12 @@ class World {
     MovementSystem movementSystem;
     RenderSystem renderSystem;
     KeyboardInputSystem keyboardInputSystem;
+    CollisionSystem collisionSystem;
 public:
     void update(float dt, SDL_Event event) {
         keyboardInputSystem.update(entities, event);
         movementSystem.update(entities, dt);
+        collisionSystem.update(*this);
         cleanup();
     };
 

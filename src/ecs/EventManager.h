@@ -1,0 +1,8 @@
+//
+// Created by parth on 10/2/2025.
+//
+
+#ifndef ADV_GAME_PROG_TECH_EVENTMANAGER_H
+#define ADV_GAME_PROG_TECH_EVENTMANAGER_H
+
+#endif //ADV_GAME_PROG_TECH_EVENTMANAGER_H

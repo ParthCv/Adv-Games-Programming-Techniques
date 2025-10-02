@@ -14,6 +14,7 @@ if (WIN32)
             ${SDL3_PATH}/lib
             ${SDL3_IMAGE_PATH}/lib
             ${PROJECT_SOURCE_DIR}/src
+            ${PROJECT_SOURCE_DIR}/src/utils
             ${PROJECT_SOURCE_DIR}/src/ecs
             ${PROJECT_SOURCE_DIR}/src/ecs/system
     )
@@ -24,7 +25,9 @@ add_executable(Adv_Game_Prog_Tech src/main.cpp
         src/TextureManager.cpp
         src/Map.cpp
         src/GameObject.cpp
-        src/Vector.cpp
+        src/utils/Vector.cpp
+        src/utils/Collision.cpp
+        src/ecs/system/CollisionSystem.cpp
 )
 
 target_link_libraries(Adv_Game_Prog_Tech

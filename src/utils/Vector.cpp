@@ -5,7 +5,6 @@
 #include "Vector.h"
 
 #include <cmath>
-#include <math.h>
 
 Vector2D Vector2D::operator*(float scalar) const {
     return {x * scalar, y * scalar};
