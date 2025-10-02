@@ -6,29 +6,41 @@
 
 #include <iostream>
 
-World::World() {
-    eventManager.subscribe<CollisionEvent>([](const CollisionEvent& collision) {
+void onCollision(const CollisionEvent& collision) {
     if (collision.entityA == nullptr || collision.entityB == nullptr) return;
 
     if (!(collision.entityA->hasComponent<Collider>() && collision.entityB->hasComponent<Collider>())) return;
 
     auto& colliderA = collision.entityA->getComponent<Collider>();
     auto& colliderB = collision.entityB->getComponent<Collider>();
+    std::cout << "Collision occurred between " << colliderA.tag << " and " << colliderB.tag << "." << std::endl;
+}
 
-    Entity* player = nullptr;
-    Entity* item = nullptr;
+World::World() {
+    eventManager.subscribe<CollisionEvent>([](const CollisionEvent& collision) {
+        if (collision.entityA == nullptr || collision.entityB == nullptr) return;
 
-    if (colliderA.tag == "Player" && colliderB.tag == "Coin") {
-        player = collision.entityA;
-        item = collision.entityB;
-    } else if (colliderB.tag == "Player" && colliderA.tag == "Coin") {
-        player = collision.entityB;
-        item = collision.entityA;
-    }
+        if (!(collision.entityA->hasComponent<Collider>() && collision.entityB->hasComponent<Collider>())) return;
 
-    if (player && item) {
-        std::cout << "Coin destroyed" << std::endl;
-        item->destroy();
-    }
-});
+        auto& colliderA = collision.entityA->getComponent<Collider>();
+        auto& colliderB = collision.entityB->getComponent<Collider>();
+
+        Entity* player = nullptr;
+        Entity* item = nullptr;
+
+        if (colliderA.tag == "Player" && colliderB.tag == "Coin") {
+            player = collision.entityA;
+            item = collision.entityB;
+        } else if (colliderB.tag == "Player" && colliderA.tag == "Coin") {
+            player = collision.entityB;
+            item = collision.entityA;
+        }
+
+        if (player && item) {
+            std::cout << "Coin destroyed" << std::endl;
+            item->destroy();
+        }
+    });
+
+    eventManager.subscribe<CollisionEvent>(onCollision);
 }
