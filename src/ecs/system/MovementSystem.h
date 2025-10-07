@@ -18,6 +18,8 @@ public:
                 auto& transform = entity->getComponent<Transform>();
                 auto& velocity = entity->getComponent<Velocity>();
 
+                transform.oldPosition = transform.position;
+
                 Vector2D directionVec = velocity.direction;
 
                 directionVec.normalize();

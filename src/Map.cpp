@@ -4,73 +4,84 @@
 
 #include "Map.h"
 #include "TextureManager.h"
+#include <sstream>
+#include "vendor/tinyxml2.h"
 
-int mapData[10][15] = {
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,1,1,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,1,1,0,0,0,0,0,0,0},
-    {0,0,0,0,1,1,2,2,1,1,0,0,0,0,0},
-    {0,0,0,0,1,1,2,2,1,1,0,0,0,0,0},
-    {0,0,0,0,0,0,1,1,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,1,1,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-};
+void Map::load(const char *path, SDL_Texture *texture) {
+    tileset = texture;
+    tinyxml2::XMLDocument doc;
+    doc.LoadFile(path);
 
-Map::Map() :
-water(TextureManager::load("../asset/water.png")),
-dirt(TextureManager::load("../asset/dirt.png")),
-grass(TextureManager::load("../asset/grass.png")){
-    load(mapData);
+    auto mapNode = doc.FirstChildElement("map");
+    width = mapNode->IntAttribute("width");
+    height = mapNode->IntAttribute("height");
 
-    // source
-    src.x = src.y = 0;
-    src.w = src.h = 32;
+    auto* layer = mapNode->FirstChildElement("layer");
+    auto* data = layer->FirstChildElement("data");
+    std::string csv = data->GetText();
+    std::stringstream ss(csv);
 
-    // destination
-    dst.x = dst.y = 0;
-    dst.w = dst.h = 64;
-}
+    tileData = std::vector(height, std::vector<int>(width));
 
-Map::~Map() {
-    if (water) SDL_DestroyTexture(water);
-    if (dirt) SDL_DestroyTexture(dirt);
-    if (grass) SDL_DestroyTexture(grass);
-}
-
-void Map::load(int data[10][15]) {
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 15; j++) {
-            mapData[i][j] = data[i][j];
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            std::string val;
+            if (!std::getline(ss, val, ',')) break;
+            tileData[i][j] = std::stoi(val);
         }
+    }
+
+    auto* objectGroup = layer->NextSiblingElement("objectgroup");
+    for (auto* obj = objectGroup->FirstChildElement("object"); obj != nullptr; obj = obj->NextSiblingElement("object")) {
+        Collider collider;
+        collider.rect.x = obj->FloatAttribute("x");
+        collider.rect.y = obj->FloatAttribute("y");
+        collider.rect.w = obj->FloatAttribute("width");
+        collider.rect.h = obj->FloatAttribute("height");
+
+        colliders.push_back(collider);
     }
 }
 
+
 void Map::draw() {
-    int type = 0;
 
-    for (int row = 0; row < 10; row++) {
-        for (int col = 0; col < 15; col++) {
-            type = mapData[row][col];
+    SDL_FRect src{}, dst{};
 
-            dst.x = static_cast<float>(col) * 64;
-            dst.y = static_cast<float>(row) * 64;
+    dst.w = 32;
+    dst.h = 32;
+
+    for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            int type = tileData[row][col];
+
+            dst.x = static_cast<float>(col) * dst.w;
+            dst.y = static_cast<float>(row) * dst.h;
 
             switch (type) {
-                case 0:
-                    TextureManager::draw(water, src, dst);
-                    break;
                 case 1:
-                    TextureManager::draw(dirt, src, dst);
+                    src.x = 0;
+                    src.y = 0;
+                    src.w = 32;
+                    src.h = 32;
                     break;
                 case 2:
-                    TextureManager::draw(grass, src, dst);
+                    src.x = 32;
+                    src.y = 0;
+                    src.w = 32;
+                    src.h = 32;
+                    break;
+                case 4:
+                    src.x = 32;
+                    src.y = 32;
+                    src.w = 32;
+                    src.h = 32;
                     break;
                 default:
                     break;
             }
 
+            TextureManager::draw(tileset, src, dst);
         }
     }
 }

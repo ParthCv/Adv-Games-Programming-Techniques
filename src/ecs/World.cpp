@@ -27,6 +27,7 @@ World::World() {
 
         Entity* player = nullptr;
         Entity* item = nullptr;
+        Entity* wall = nullptr;
 
         if (colliderA.tag == "Player" && colliderB.tag == "Coin") {
             player = collision.entityA;
@@ -40,6 +41,22 @@ World::World() {
             std::cout << "Coin destroyed" << std::endl;
             item->destroy();
         }
+
+
+        if (colliderA.tag == "Player" && colliderB.tag == "Wall") {
+            player = collision.entityA;
+            wall = collision.entityB;
+        } else if (colliderB.tag == "Player" && colliderA.tag == "Wall") {
+            player = collision.entityB;
+            wall = collision.entityA;
+        }
+
+        if (player && wall) {
+            std::cout << "Player collided with wall" << std::endl;
+            auto& transform = player->getComponent<Transform>();
+            transform.position = transform.oldPosition;
+        }
+
     });
 
     eventManager.subscribe<CollisionEvent>(onCollision);

@@ -5,15 +5,22 @@
 #ifndef ADV_GAME_PROG_TECH_MAP_H
 #define ADV_GAME_PROG_TECH_MAP_H
 
-#include "Game.h"
+#include <vector>
+#include <SDL3/SDL.h>
+#include "./ecs/Component.h"
 
 class Map {
     public:
-        Map();
-        ~Map();
+        Map() = default;
+        ~Map() = default;
 
-        void load(int data[10][15]);
+        void load(const char *path, SDL_Texture *texture);
         void draw();
+
+        SDL_Texture *tileset = nullptr;
+        int width{}, height{};
+        std::vector<std::vector<int>> tileData;
+        std::vector<Collider> colliders;
 
     private:
         SDL_FRect src{}, dst{}; // brace initialization, all members would be set to 0

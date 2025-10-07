@@ -8,9 +8,6 @@
 #include <iostream>
 #include <ostream>
 
-
-Map *map = nullptr;
-
 Game::Game() {
 
 }
@@ -46,11 +43,27 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
         isRunning = false;
     }
 
-    // Load our map
-    map = new Map();
+    // load map
+    world.getMap().load("../asset/map.tmx", TextureManager::load("../asset/spritesheet.png"));
+
+    for (auto &collider_data : world.getMap().colliders) {
+        auto& entity = world.createEntity();
+        entity.addComponent<Transform>(Vector2D(collider_data.rect.x, collider_data.rect.y), 0.0f, 1.0f);
+        auto& collider = entity.addComponent<Collider>("Wall");
+
+        collider.rect.x = collider_data.rect.x;
+        collider.rect.y = collider_data.rect.y;
+        collider.rect.w = collider_data.rect.w;
+        collider.rect.h = collider_data.rect.h;
+
+        SDL_Texture* texture = TextureManager::load("../asset/spritesheet.png");
+        SDL_FRect source {0, 32, 32, 32};
+        SDL_FRect destination {collider.rect.x, collider.rect.y, collider.rect.w, collider.rect.h};
+        entity.addComponent<Sprite>(texture, source, destination);
+    }
 
     auto& player(world.createEntity());
-    auto& playerTransform = player.addComponent<Transform>(Vector2D(0,0), 0.0f, 1.0f);
+    auto& playerTransform = player.addComponent<Transform>(Vector2D(200,50), 0.0f, 1.0f);
 
     SDL_Texture *texture = TextureManager::load("../asset/mario.png");
     SDL_FRect playerSrcRect = {0,0,32,44};
@@ -122,8 +135,6 @@ void Game::render() {
     // SDL_SetRenderDrawColor(renderer, r, g, b, a);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-
-    map->draw();
 
     world.render();
 
