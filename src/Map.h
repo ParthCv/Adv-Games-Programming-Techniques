@@ -21,15 +21,10 @@ class Map {
         int width{}, height{};
         std::vector<std::vector<int>> tileData;
         std::vector<Collider> colliders;
+        std::vector<Position> itemSpawnPositions;
 
     private:
         SDL_FRect src{}, dst{}; // brace initialization, all members would be set to 0
-        SDL_Texture *water = nullptr;
-        SDL_Texture *dirt = nullptr;
-        SDL_Texture *ball = nullptr;
-        SDL_Texture *grass = nullptr;
-
-        int map[10][15]{};
 };
 
 #endif //ADV_GAME_PROG_TECH_MAP_H

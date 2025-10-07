@@ -46,6 +46,7 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     // load map
     world.getMap().load("../asset/map.tmx", TextureManager::load("../asset/spritesheet.png"));
 
+    // Add colliders
     for (auto &collider_data : world.getMap().colliders) {
         auto& entity = world.createEntity();
         entity.addComponent<Transform>(Vector2D(collider_data.rect.x, collider_data.rect.y), 0.0f, 1.0f);
@@ -62,6 +63,21 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
         entity.addComponent<Sprite>(texture, source, destination);
     }
 
+    // Add Items
+    for (auto &item_spawn_position : world.getMap().itemSpawnPositions) {
+        auto& item (world.createEntity());
+        auto& itemTransform = item.addComponent<Transform>(Vector2D(item_spawn_position.x,item_spawn_position.y), 0.0f, 1.0f);
+
+        SDL_Texture *itemTexture = TextureManager::load("../asset/coin.png");
+        SDL_FRect itemSrcRect = {0,0,32,32};
+        SDL_FRect itemDstRect = {itemTransform.position.x,itemTransform.position.y,32,32};
+
+        item.addComponent<Sprite>(itemTexture, itemSrcRect, itemDstRect);
+        auto& itemCollider = item.addComponent<Collider>("Coin");
+        itemCollider.rect.w = itemDstRect.w;
+        itemCollider.rect.h = itemDstRect.h;
+    }
+
     auto& player(world.createEntity());
     auto& playerTransform = player.addComponent<Transform>(Vector2D(200,50), 0.0f, 1.0f);
 
@@ -75,18 +91,6 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     auto& playerCollider = player.addComponent<Collider>("Player");
     playerCollider.rect.w = playerDstRect.w;
     playerCollider.rect.h = playerDstRect.h;
-
-    auto& item (world.createEntity());
-    auto& itemTransform = item.addComponent<Transform>(Vector2D(300,300), 0.0f, 1.0f);
-
-    SDL_Texture *itemTexture = TextureManager::load("../asset/coin.png");
-    SDL_FRect itemSrcRect = {0,0,32,32};
-    SDL_FRect itemDstRect = {itemTransform.position.x,itemTransform.position.y,32,32};
-
-    item.addComponent<Sprite>(itemTexture, itemSrcRect, itemDstRect);
-    auto& itemCollider = item.addComponent<Collider>("Coin");
-    itemCollider.rect.w = itemDstRect.w;
-    itemCollider.rect.h = itemDstRect.h;
 
 }
 

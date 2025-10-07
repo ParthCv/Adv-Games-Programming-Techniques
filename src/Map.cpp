@@ -3,6 +3,9 @@
 //
 
 #include "Map.h"
+
+#include <iostream>
+
 #include "TextureManager.h"
 #include <sstream>
 #include "vendor/tinyxml2.h"
@@ -31,8 +34,8 @@ void Map::load(const char *path, SDL_Texture *texture) {
         }
     }
 
-    auto* objectGroup = layer->NextSiblingElement("objectgroup");
-    for (auto* obj = objectGroup->FirstChildElement("object"); obj != nullptr; obj = obj->NextSiblingElement("object")) {
+    auto* collisionGroup = layer->NextSiblingElement("objectgroup");
+    for (auto* obj = collisionGroup->FirstChildElement("object"); obj != nullptr; obj = obj->NextSiblingElement("object")) {
         Collider collider;
         collider.rect.x = obj->FloatAttribute("x");
         collider.rect.y = obj->FloatAttribute("y");
@@ -40,6 +43,15 @@ void Map::load(const char *path, SDL_Texture *texture) {
         collider.rect.h = obj->FloatAttribute("height");
 
         colliders.push_back(collider);
+    }
+
+    auto* itemGroup = collisionGroup->NextSiblingElement("objectgroup");
+    for (auto* obj = itemGroup->FirstChildElement("object"); obj != nullptr; obj = obj->NextSiblingElement("object")) {
+        Position itemPos;
+        itemPos.x = obj->FloatAttribute("x");
+        itemPos.y = obj->FloatAttribute("y");
+
+        itemSpawnPositions.push_back(itemPos);
     }
 }
 
