@@ -4,6 +4,7 @@
 
 #include "Map.h"
 
+#include <cmath>
 #include <iostream>
 
 #include "TextureManager.h"
@@ -56,7 +57,7 @@ void Map::load(const char *path, SDL_Texture *texture) {
 }
 
 
-void Map::draw() {
+void Map::draw(const Camera &camera) {
 
     SDL_FRect src{}, dst{};
 
@@ -67,8 +68,11 @@ void Map::draw() {
         for (int col = 0; col < width; col++) {
             int type = tileData[row][col];
 
-            dst.x = static_cast<float>(col) * dst.w;
-            dst.y = static_cast<float>(row) * dst.h;
+            float worldX = static_cast<float>(col) * dst.w;
+            float worldY = static_cast<float>(row) * dst.h;
+
+            dst.x = std::round(worldX - camera.view.x);
+            dst.y = std::round(worldY - camera.view.y);
 
             switch (type) {
                 case 1:
@@ -90,7 +94,7 @@ void Map::draw() {
                     src.h = 32;
                     break;
                 default:
-                    break;
+                    continue;
             }
 
             TextureManager::draw(tileset, src, dst);

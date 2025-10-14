@@ -11,6 +11,7 @@
 #include "EventManager.h"
 #include "../Map.h"
 #include "system/AnimationSystem.h"
+#include "system/CameraSystem.h"
 #include "system/CollisionSystem.h"
 #include "system/KeyboardInputSystem.h"
 #include "system/MovementSystem.h"
@@ -25,6 +26,7 @@ class World {
     CollisionSystem collisionSystem;
     EventManager eventManager;
     AnimationSystem animationSystem;
+    CameraSystem cameraSystem;
 public:
     World();
     void update(float dt, SDL_Event event) {
@@ -32,11 +34,18 @@ public:
         movementSystem.update(entities, dt);
         collisionSystem.update(*this);
         animationSystem.update(entities, dt);
+        cameraSystem.update(entities);
         cleanup();
     };
 
     void render() {
-        map.draw();
+        for (auto& entity : entities) {
+            if (entity->hasComponent<Camera>()) {
+                map.draw(entity->getComponent<Camera>());
+                break;
+            }
+        }
+
         renderSystem.render(entities);
     }
 

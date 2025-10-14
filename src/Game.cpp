@@ -45,10 +45,16 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
         isRunning = false;
     }
 
-    AssetManager::loadAnimation("player", "../asset/animations/bull_animations.xml");
+    AssetManager::loadAnimation("player", "../asset/animations/rooster.xml");
 
     // load map
     world.getMap().load("../asset/map.tmx", TextureManager::load("../asset/spritesheet.png"));
+
+    auto& camera = world.createEntity();
+    SDL_FRect camView{};
+    camView.w = width;
+    camView.h = height;
+    camera.addComponent<Camera>(camView, world.getMap().width * 32, world.getMap().height * 32);
 
     // Add colliders
     for (auto &collider_data : world.getMap().colliders) {
@@ -88,7 +94,7 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     Animation animation = AssetManager::getAnimation("player");
     player.addComponent<Animation>(animation);
 
-    SDL_Texture *texture = TextureManager::load("../asset/animations/bull_anim.png");
+    SDL_Texture *texture = TextureManager::load("../asset/animations/Rooster_animation_with_shadow.png");
     SDL_FRect playerSrcRect = animation.clips[animation.currentClip].frameIndices[0];
     SDL_FRect playerDstRect = {playerTransform.position.x,playerTransform.position.y,64,64};
 
@@ -98,6 +104,8 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     auto& playerCollider = player.addComponent<Collider>("Player");
     playerCollider.rect.w = playerDstRect.w;
     playerCollider.rect.h = playerDstRect.h;
+
+    player.addComponent<PlayerTag>();
 
 }
 

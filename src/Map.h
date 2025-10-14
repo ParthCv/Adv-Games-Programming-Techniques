@@ -15,7 +15,7 @@ class Map {
         ~Map() = default;
 
         void load(const char *path, SDL_Texture *texture);
-        void draw();
+        void draw(const Camera &camera);
 
         SDL_Texture *tileset = nullptr;
         int width{}, height{};
