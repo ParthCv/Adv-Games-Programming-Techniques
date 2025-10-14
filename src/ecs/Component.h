@@ -5,9 +5,11 @@
 #ifndef ADV_GAME_PROG_TECH_COMPONENT_H
 #define ADV_GAME_PROG_TECH_COMPONENT_H
 #include <string>
+#include <unordered_map>
 #include <SDL3/SDL_render.h>
 
 #include "../utils/Vector.h"
+#include "system/AnimationClip.h"
 
 struct Transform {
     Vector2D position{};
@@ -35,6 +37,15 @@ struct Sprite {
 struct Collider {
     std::string tag;
     SDL_FRect rect{};
+};
+
+struct Animation {
+    // Key is the animation name and clip will hold the animation
+    std::unordered_map<std::string, AnimationClip> clips{};
+    std::string currentClip{};
+    float time{};
+    int currentFrame{};
+    float speed = 0.1f;
 };
 
 #endif //ADV_GAME_PROG_TECH_COMPONENT_H
