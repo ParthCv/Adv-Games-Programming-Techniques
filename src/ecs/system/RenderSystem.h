@@ -20,6 +20,12 @@ public:
                 auto& sprite = entity->getComponent<Sprite>();
                 sprite.dest.x = t.position.x;
                 sprite.dest.y = t.position.y;
+
+                if (entity->hasComponent<Animation>()) {
+                    auto& anim = entity->getComponent<Animation>();
+                    sprite.src = anim.clips[anim.currentClip].frameIndices[anim.currentFrame];
+                }
+
                 TextureManager::draw(sprite.texture,sprite.src, sprite.dest);
             }
         }

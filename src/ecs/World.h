@@ -10,6 +10,7 @@
 #include "Entity.h"
 #include "EventManager.h"
 #include "../Map.h"
+#include "system/AnimationSystem.h"
 #include "system/CollisionSystem.h"
 #include "system/KeyboardInputSystem.h"
 #include "system/MovementSystem.h"
@@ -23,12 +24,14 @@ class World {
     KeyboardInputSystem keyboardInputSystem;
     CollisionSystem collisionSystem;
     EventManager eventManager;
+    AnimationSystem animationSystem;
 public:
     World();
     void update(float dt, SDL_Event event) {
         keyboardInputSystem.update(entities, event);
         movementSystem.update(entities, dt);
         collisionSystem.update(*this);
+        animationSystem.update(entities, dt);
         cleanup();
     };
 

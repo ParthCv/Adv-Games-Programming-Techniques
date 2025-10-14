@@ -8,6 +8,8 @@
 #include <iostream>
 #include <ostream>
 
+#include "AssetManager.h"
+
 Game::Game() {
 
 }
@@ -43,6 +45,8 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
         isRunning = false;
     }
 
+    AssetManager::loadAnimation("player", "../asset/animations/bull_animations.xml");
+
     // load map
     world.getMap().load("../asset/map.tmx", TextureManager::load("../asset/spritesheet.png"));
 
@@ -50,7 +54,7 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     for (auto &collider_data : world.getMap().colliders) {
         auto& entity = world.createEntity();
         entity.addComponent<Transform>(Vector2D(collider_data.rect.x, collider_data.rect.y), 0.0f, 1.0f);
-        auto& collider = entity.addComponent<Collider>("Wall");
+        auto& collider = entity.addComponent<Collider>("W");
 
         collider.rect.x = collider_data.rect.x;
         collider.rect.y = collider_data.rect.y;
@@ -60,7 +64,7 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
         SDL_Texture* texture = TextureManager::load("../asset/spritesheet.png");
         SDL_FRect source {0, 32, 32, 32};
         SDL_FRect destination {collider.rect.x, collider.rect.y, collider.rect.w, collider.rect.h};
-        entity.addComponent<Sprite>(texture, source, destination);
+        //entity.addComponent<Sprite>(texture, source, destination);
     }
 
     // Add Items
@@ -81,9 +85,12 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     auto& player(world.createEntity());
     auto& playerTransform = player.addComponent<Transform>(Vector2D(200,50), 0.0f, 1.0f);
 
-    SDL_Texture *texture = TextureManager::load("../asset/mario.png");
-    SDL_FRect playerSrcRect = {0,0,32,44};
-    SDL_FRect playerDstRect = {playerTransform.position.x,playerTransform.position.y,64,88};
+    Animation animation = AssetManager::getAnimation("player");
+    player.addComponent<Animation>(animation);
+
+    SDL_Texture *texture = TextureManager::load("../asset/animations/bull_anim.png");
+    SDL_FRect playerSrcRect = animation.clips[animation.currentClip].frameIndices[0];
+    SDL_FRect playerDstRect = {playerTransform.position.x,playerTransform.position.y,64,64};
 
     player.addComponent<Velocity>(Vector2D(0.0,0.0), 120.0f);
     player.addComponent<Sprite>(texture, playerSrcRect, playerDstRect);
