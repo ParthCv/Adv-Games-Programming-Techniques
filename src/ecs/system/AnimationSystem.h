@@ -14,7 +14,7 @@ class AnimationSystem {
 public:
     void update(const std::vector<std::unique_ptr<Entity>>& entities, float deltaTime) {
         for (auto& entity : entities) {
-            if (entity->hasComponent<Animation>() && entity->hasComponent<Velocity>()) {
+            if (entity->hasComponent<Animation>() && entity->hasComponent<Velocity>() && entity->hasComponent<PlayerTag>()) {
                 auto& animation = entity->getComponent<Animation>();
                 auto& velocity = entity->getComponent<Velocity>();
 
@@ -32,6 +32,31 @@ public:
                     newClip = "idle";
                 }
 
+                //check for anim switch
+                if (newClip != animation.currentClip) {
+                    animation.currentClip = newClip;
+                    animation.time = 0.0f;
+                    animation.currentFrame =0;
+                }
+
+                float animationFrameSpeed = animation.speed;
+                auto clip = animation.clips[animation.currentClip];
+
+                animation.time += deltaTime;
+
+                if (animation.time >= animationFrameSpeed) {
+                    animation.time -= animationFrameSpeed;
+
+                    std::size_t totalFrames = clip.frameIndices.size();
+                    animation.currentFrame = (animation.currentFrame + 1) % totalFrames;
+                }
+            } else if (entity->hasComponent<Animation>() && entity->hasComponent<Velocity>() && entity->hasComponent<ProjectileTag>()) {
+                auto& animation = entity->getComponent<Animation>();
+                auto& velocity = entity->getComponent<Velocity>();
+
+                std::string newClip;
+
+                newClip = "idle_right";
                 //check for anim switch
                 if (newClip != animation.currentClip) {
                     animation.currentClip = newClip;

@@ -13,7 +13,7 @@ void onCollision(const CollisionEvent& collision) {
 
     auto& colliderA = collision.entityA->getComponent<Collider>();
     auto& colliderB = collision.entityB->getComponent<Collider>();
-    std::cout << "Collision occurred between " << colliderA.tag << " and " << colliderB.tag << "." << std::endl;
+    // std::cout << "Collision occurred between " << colliderA.tag << " and " << colliderB.tag << "." << std::endl;
 }
 
 World::World() {
@@ -28,6 +28,7 @@ World::World() {
         Entity* player = nullptr;
         Entity* item = nullptr;
         Entity* wall = nullptr;
+        Entity* projectile = nullptr;
 
         if (colliderA.tag == "Player" && colliderB.tag == "Coin") {
             player = collision.entityA;
@@ -55,6 +56,18 @@ World::World() {
             std::cout << "Player collided with wall" << std::endl;
             auto& transform = player->getComponent<Transform>();
             transform.position = transform.oldPosition;
+        }
+
+        if (colliderA.tag == "Player" && colliderB.tag == "projectile") {
+            player = collision.entityA;
+            projectile = collision.entityB;
+        } else if (colliderB.tag == "Player" && colliderA.tag == "projectile") {
+            player = collision.entityB;
+            projectile = collision.entityA;
+        }
+
+        if (player && projectile) {
+            player->destroy();
         }
 
     });

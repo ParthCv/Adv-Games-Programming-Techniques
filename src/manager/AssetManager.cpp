@@ -4,7 +4,7 @@
 
 #include "AssetManager.h"
 
-#include "vendor/tinyxml2.h"
+#include "../vendor/tinyxml2.h"
 
 std::unordered_map<std::string, Animation> AssetManager::animations;
 

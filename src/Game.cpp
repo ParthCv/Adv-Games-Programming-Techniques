@@ -8,7 +8,7 @@
 #include <iostream>
 #include <ostream>
 
-#include "AssetManager.h"
+#include "manager/AssetManager.h"
 
 Game::Game() {
 
@@ -46,6 +46,7 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     }
 
     AssetManager::loadAnimation("player", "../asset/animations/rooster.xml");
+    AssetManager::loadAnimation("enemy", "../asset/animations/bird_animations.xml");
 
     // load map
     world.getMap().load("../asset/map.tmx", TextureManager::load("../asset/spritesheet.png"));
@@ -107,6 +108,38 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
 
     player.addComponent<PlayerTag>();
 
+    auto& spawner(world.createEntity());
+    Transform transform = spawner.addComponent<Transform>(Vector2D(width/2, height - 5), 0.0f, 1.0f);
+
+    Entity* spawnPtr = &spawner;
+
+    spawner.addComponent<TimedSpawner>(2.0f, [this, spawnPtr] {
+        std::cout << "Spawning" << std::endl;
+        if (!spawnPtr->isActive()) return;
+
+        auto& transform = spawnPtr->getComponent<Transform>();
+        auto& e(world.createDeferredEntity());
+        std::cout << "Entity created"<< std::endl;
+        e.addComponent<Transform>(Vector2D(100,150), 0.0f, 1.0f);
+        e.addComponent<Velocity>(Vector2D(0.0f, -1.0f), 100.0f);
+
+        Animation animation = AssetManager::getAnimation("enemy");
+        e.addComponent<Animation>(animation);
+
+        SDL_Texture* texture = TextureManager::load("../asset/animations/bird_anim.png");
+        SDL_FRect src = {0,0,32,32};
+        SDL_FRect dest = {transform.position.x,transform.position.y,32,32};
+        e.addComponent<Sprite>(texture, src, dest);
+
+        Collider collider = e.addComponent<Collider>("projectile");
+        collider.rect.w = dest.w;
+        collider.rect.h = dest.h;
+
+        e.addComponent<ProjectileTag>();
+
+        std::cout << "Entity fully configured!" << std::endl;
+    });
+
 }
 
 void Game::handleEvents() {
@@ -132,7 +165,7 @@ void Game::update() {
     lastFrameTime = currentTime;
 
     frameCount++;
-    std::cout << frameCount << " delta time :" << deltaTime << std::endl;
+    // std::cout << frameCount << " delta time :" << deltaTime << std::endl;
     world.update(deltaTime, event);
 }
 

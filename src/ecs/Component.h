@@ -4,6 +4,7 @@
 
 #ifndef ADV_GAME_PROG_TECH_COMPONENT_H
 #define ADV_GAME_PROG_TECH_COMPONENT_H
+#include <functional>
 #include <string>
 #include <unordered_map>
 #include <SDL3/SDL_render.h>
@@ -53,6 +54,18 @@ struct Camera {
     float worldWidth;
     float worldHeight;
 };
+
+struct TimedSpawner {
+    float spawnInterval{};
+    std::function<void()> spawnCallback{};
+    float timer{};
+};
+
+struct SceneState {
+    int coinsCollected = 0;
+};
+
+struct ProjectileTag {};
 
 struct PlayerTag{};
 

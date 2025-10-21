@@ -7,7 +7,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "ecs/Component.h"
+#include "../ecs/Component.h"
 
 class AssetManager {
   static std::unordered_map<std::string, Animation> animations;
