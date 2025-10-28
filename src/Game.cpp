@@ -10,6 +10,8 @@
 
 #include "manager/AssetManager.h"
 
+std::function<void(std::string)> Game::onSceneChangeRequest;
+
 Game::Game() {
 
 }
@@ -48,97 +50,26 @@ void Game::init(const char *title, int width, int height, bool fullscreen) {
     AssetManager::loadAnimation("player", "../asset/animations/rooster.xml");
     AssetManager::loadAnimation("enemy", "../asset/animations/bird_animations.xml");
 
-    // load map
-    world.getMap().load("../asset/map.tmx", TextureManager::load("../asset/spritesheet.png"));
+    //
+    sceneManager.loadScene("level1", "../asset/map.tmx", width, height);
+    sceneManager.loadScene("level2", "../asset/map2.tmx", width, height);
 
-    auto& camera = world.createEntity();
-    SDL_FRect camView{};
-    camView.w = width;
-    camView.h = height;
-    camera.addComponent<Camera>(camView, world.getMap().width * 32, world.getMap().height * 32);
+    sceneManager.changeSceneDeferred("level1");
 
-    // Add colliders
-    for (auto &collider_data : world.getMap().colliders) {
-        auto& entity = world.createEntity();
-        entity.addComponent<Transform>(Vector2D(collider_data.rect.x, collider_data.rect.y), 0.0f, 1.0f);
-        auto& collider = entity.addComponent<Collider>("W");
+    onSceneChangeRequest = [this](std::string sceneName) {
+        if (sceneManager.currentScene->getName() == "level2" && sceneName == "level2") {
+            std::cout << "You Win" << std::endl;
+            isRunning = false;
+            return;
+        }
 
-        collider.rect.x = collider_data.rect.x;
-        collider.rect.y = collider_data.rect.y;
-        collider.rect.w = collider_data.rect.w;
-        collider.rect.h = collider_data.rect.h;
+        if (sceneName == "gameover") {
+            isRunning = false;
+            return;
+        }
 
-        SDL_Texture* texture = TextureManager::load("../asset/spritesheet.png");
-        SDL_FRect source {0, 32, 32, 32};
-        SDL_FRect destination {collider.rect.x, collider.rect.y, collider.rect.w, collider.rect.h};
-        //entity.addComponent<Sprite>(texture, source, destination);
-    }
-
-    // Add Items
-    for (auto &item_spawn_position : world.getMap().itemSpawnPositions) {
-        auto& item (world.createEntity());
-        auto& itemTransform = item.addComponent<Transform>(Vector2D(item_spawn_position.x,item_spawn_position.y), 0.0f, 1.0f);
-
-        SDL_Texture *itemTexture = TextureManager::load("../asset/coin.png");
-        SDL_FRect itemSrcRect = {0,0,32,32};
-        SDL_FRect itemDstRect = {itemTransform.position.x,itemTransform.position.y,32,32};
-
-        item.addComponent<Sprite>(itemTexture, itemSrcRect, itemDstRect);
-        auto& itemCollider = item.addComponent<Collider>("Coin");
-        itemCollider.rect.w = itemDstRect.w;
-        itemCollider.rect.h = itemDstRect.h;
-    }
-
-    auto& player(world.createEntity());
-    auto& playerTransform = player.addComponent<Transform>(Vector2D(200,50), 0.0f, 1.0f);
-
-    Animation animation = AssetManager::getAnimation("player");
-    player.addComponent<Animation>(animation);
-
-    SDL_Texture *texture = TextureManager::load("../asset/animations/Rooster_animation_with_shadow.png");
-    SDL_FRect playerSrcRect = animation.clips[animation.currentClip].frameIndices[0];
-    SDL_FRect playerDstRect = {playerTransform.position.x,playerTransform.position.y,64,64};
-
-    player.addComponent<Velocity>(Vector2D(0.0,0.0), 120.0f);
-    player.addComponent<Sprite>(texture, playerSrcRect, playerDstRect);
-
-    auto& playerCollider = player.addComponent<Collider>("Player");
-    playerCollider.rect.w = playerDstRect.w;
-    playerCollider.rect.h = playerDstRect.h;
-
-    player.addComponent<PlayerTag>();
-
-    auto& spawner(world.createEntity());
-    Transform transform = spawner.addComponent<Transform>(Vector2D(width/2, height - 5), 0.0f, 1.0f);
-
-    Entity* spawnPtr = &spawner;
-
-    spawner.addComponent<TimedSpawner>(2.0f, [this, spawnPtr] {
-        std::cout << "Spawning" << std::endl;
-        if (!spawnPtr->isActive()) return;
-
-        auto& transform = spawnPtr->getComponent<Transform>();
-        auto& e(world.createDeferredEntity());
-        std::cout << "Entity created"<< std::endl;
-        e.addComponent<Transform>(Vector2D(100,150), 0.0f, 1.0f);
-        e.addComponent<Velocity>(Vector2D(0.0f, -1.0f), 100.0f);
-
-        Animation animation = AssetManager::getAnimation("enemy");
-        e.addComponent<Animation>(animation);
-
-        SDL_Texture* texture = TextureManager::load("../asset/animations/bird_anim.png");
-        SDL_FRect src = {0,0,32,32};
-        SDL_FRect dest = {transform.position.x,transform.position.y,32,32};
-        e.addComponent<Sprite>(texture, src, dest);
-
-        Collider collider = e.addComponent<Collider>("projectile");
-        collider.rect.w = dest.w;
-        collider.rect.h = dest.h;
-
-        e.addComponent<ProjectileTag>();
-
-        std::cout << "Entity fully configured!" << std::endl;
-    });
+        sceneManager.changeSceneDeferred(sceneName);
+    };
 
 }
 
@@ -163,10 +94,9 @@ void Game::update() {
 
     float deltaTime = (currentTime - lastFrameTime) / 1000.0f;
     lastFrameTime = currentTime;
-
+    sceneManager.update(deltaTime, event);
     frameCount++;
     // std::cout << frameCount << " delta time :" << deltaTime << std::endl;
-    world.update(deltaTime, event);
 }
 
 void Game::render() {
@@ -187,9 +117,7 @@ void Game::render() {
     // SDL_SetRenderDrawColor(renderer, r, g, b, a);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-
-    world.render();
-
+    sceneManager.render();
     SDL_RenderPresent(renderer);
 }
 

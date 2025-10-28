@@ -3,6 +3,7 @@
 //
 
 #include "World.h"
+#include "../Game.h"
 
 #include <iostream>
 
@@ -17,7 +18,19 @@ void onCollision(const CollisionEvent& collision) {
 }
 
 World::World() {
-    eventManager.subscribe<CollisionEvent>([](const CollisionEvent& collision) {
+    eventManager.subscribe([this](const CollisionEvent& collision) {
+
+        Entity* sceneStateEntity = nullptr;
+
+        for (auto& e:entities) {
+           if(e->hasComponent<SceneState>()) {
+               sceneStateEntity = e.get();
+               break;
+           }
+        }
+
+        if (sceneStateEntity == nullptr) return;
+
         if (collision.entityA == nullptr || collision.entityB == nullptr) return;
 
         if (!(collision.entityA->hasComponent<Collider>() && collision.entityB->hasComponent<Collider>())) return;
@@ -41,6 +54,13 @@ World::World() {
         if (player && item) {
             std::cout << "Coin destroyed" << std::endl;
             item->destroy();
+            auto& sceneState = sceneStateEntity->getComponent<SceneState>();
+            sceneState.coinsCollected++;
+
+            if (sceneState.coinsCollected > 1) {
+                std::cout << "level2" << std::endl;
+                Game::onSceneChangeRequest("level2");
+            }
         }
 
 
@@ -68,9 +88,11 @@ World::World() {
 
         if (player && projectile) {
             player->destroy();
+            std::cout << "game over"<< std::endl;
+            Game::onSceneChangeRequest("gameover");
         }
 
     });
 
-    eventManager.subscribe<CollisionEvent>(onCollision);
+    eventManager.subscribe(onCollision);
 }

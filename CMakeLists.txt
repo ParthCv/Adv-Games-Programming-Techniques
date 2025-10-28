@@ -33,6 +33,7 @@ add_executable(Adv_Game_Prog_Tech src/main.cpp
         src/vendor/tinyxml2.cpp
         src/manager/AssetManager.cpp
         src/ecs/system/AnimationSystem.h
+        src/manager/Scene.cpp
 )
 
 target_link_libraries(Adv_Game_Prog_Tech

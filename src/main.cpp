@@ -12,7 +12,7 @@ int main() {
     int actualFrameTime;
 
     game = new Game();
-    game->init("Tutorial", 800, 800, false);
+    game->init("Tutorial", 800, 600, false);
 
     while (game->running()) {
         ticks = SDL_GetTicks();

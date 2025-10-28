@@ -35,24 +35,48 @@ void Map::load(const char *path, SDL_Texture *texture) {
         }
     }
 
-    auto* collisionGroup = layer->NextSiblingElement("objectgroup");
-    for (auto* obj = collisionGroup->FirstChildElement("object"); obj != nullptr; obj = obj->NextSiblingElement("object")) {
-        Collider collider;
-        collider.rect.x = obj->FloatAttribute("x");
-        collider.rect.y = obj->FloatAttribute("y");
-        collider.rect.w = obj->FloatAttribute("width");
-        collider.rect.h = obj->FloatAttribute("height");
+    for (auto* objectGroup = mapNode->FirstChildElement("objectgroup");
+         objectGroup != nullptr;
+         objectGroup = objectGroup->NextSiblingElement("objectgroup")) {
+        const char* groupName = objectGroup->Attribute("name");
+        if (!groupName) {
+            std::cout << "Warning: Found objectgroup without name attribute, skipping" << std::endl;
+            continue;
+        }
 
-        colliders.push_back(collider);
-    }
+        std::string groupNameStr(groupName);
+        std::cout << "Processing object group: " << groupNameStr << std::endl;
 
-    auto* itemGroup = collisionGroup->NextSiblingElement("objectgroup");
-    for (auto* obj = itemGroup->FirstChildElement("object"); obj != nullptr; obj = obj->NextSiblingElement("object")) {
-        Position itemPos;
-        itemPos.x = obj->FloatAttribute("x");
-        itemPos.y = obj->FloatAttribute("y");
+        // Process Collision Layer
+        if (groupNameStr == "Collision Layer") {
+            for (auto* obj = objectGroup->FirstChildElement("object");
+                 obj != nullptr;
+                 obj = obj->NextSiblingElement("object")) {
+                Collider collider;
+                collider.rect.x = obj->FloatAttribute("x");
+                collider.rect.y = obj->FloatAttribute("y");
+                collider.rect.w = obj->FloatAttribute("width");
+                collider.rect.h = obj->FloatAttribute("height");
+                colliders.push_back(collider);
+                 }
+            std::cout << "  Loaded " << colliders.size() << " colliders" << std::endl;
+        }
 
-        itemSpawnPositions.push_back(itemPos);
+        else if (groupNameStr == "Item Layer" || groupNameStr == "ItemSpawns") {
+            for (auto* obj = objectGroup->FirstChildElement("object");
+                 obj != nullptr;
+                 obj = obj->NextSiblingElement("object")) {
+                Position spawn;
+                spawn.x = obj->FloatAttribute("x");
+                spawn.y = obj->FloatAttribute("y");
+                itemSpawnPositions.push_back(spawn);
+                 }
+            std::cout << "  Loaded " << itemSpawnPositions.size() << " item spawn points" << std::endl;
+        }
+
+        else {
+            std::cout << "  Unknown object group type: " << groupNameStr << " (skipping)" << std::endl;
+        }
     }
 }
 

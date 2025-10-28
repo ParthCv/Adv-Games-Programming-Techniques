@@ -4,7 +4,6 @@
 
 #ifndef ADV_GAME_PROG_TECH_WORLD_H
 #define ADV_GAME_PROG_TECH_WORLD_H
-#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -45,7 +44,6 @@ public:
         destructionSystem.update(entities);
         synchronizeEntities();
         cleanup();
-        std::cout << "Total entities: " << entities.size() << std::endl;
     };
 
     void render() {
